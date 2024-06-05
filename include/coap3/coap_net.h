@@ -38,6 +38,18 @@
 #include "coap_session.h"
 #include "coap_debug.h"
 
+#if defined(__ZEPHYR__) && !defined(__unix__) && !defined(__linux__)
+#include <zephyr/kernel.h>
+#include <zephyr/net/net_ip.h>
+#include <zephyr/net/socket.h>
+#include <zephyr/posix/sys/ioctl.h> // This is for FIONBIO
+#include <zephyr/net/socket_select.h>
+#include <zephyr/net/socket_types.h>
+
+#define fd_set zsock_fd_set
+// TODO_zephyr, is this required???
+#endif /* ! __ZEPHYR__  || __unix__ || __linux__ */
+
 /**
  * @ingroup application_api
  * @defgroup context Context Handling

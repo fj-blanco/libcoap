@@ -39,9 +39,23 @@ typedef USHORT in_port_t;
 #endif
 #endif /* !defined(__MINGW32__) */
 #elif !defined (CONTIKI) && !defined (WITH_LWIP) && !defined (RIOT_VERSION)
+#if !defined(__ZEPHYR__) || defined(__unix__) || defined(__linux__)
 #include <netinet/in.h>
 #include <sys/socket.h>
-#endif /* ! CONTIKI && ! WITH_LWIP && ! RIOT_VERSION */
+#elif defined(__ZEPHYR__)
+#include <zephyr/kernel.h>
+#include <zephyr/net/net_ip.h>
+#include <zephyr/net/socket.h>
+#include <zephyr/posix/sys/ioctl.h> // This is for FIONBIO
+#include <zephyr/net/socket_select.h>
+#include <zephyr/net/socket_types.h>
+// TODO_zephyr, is this required???
+#endif /* ! __ZEPHYR__  || __unix__ || __linux__ */
+#endif /* ! CONTIKI && ! WITH_LWIP && ! RIOT_VERSION && ! __ZEPHYR__ */
+
+//#if defined(__ZEPHYR__)
+//#include <zephyr/net/socket.h>
+//#endif
 
 #ifndef COAP_STATIC_INLINE
 #  if defined(__cplusplus)

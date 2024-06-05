@@ -54,6 +54,13 @@
 #endif
 #endif /* COAP_EPOLL_SUPPORT */
 
+#if defined(__ZEPHYR__)
+#define 	FD_ZERO   ZSOCK_FD_ZERO
+#define 	FD_SET   ZSOCK_FD_SET
+#define 	FD_ISSET   ZSOCK_FD_ISSET
+# define OPTVAL_T(t)         (t)
+#endif
+
 #if !defined(WITH_CONTIKI) && !defined(RIOT_VERSION) && !defined(WITH_LWIP)
 /* define generic PKTINFO for IPv4 */
 #if defined(IP_PKTINFO)
@@ -707,7 +714,7 @@ coap_socket_read(coap_socket_t *sock, uint8_t *data, size_t data_len) {
 /* define struct in6_pktinfo and struct in_pktinfo if not available
    FIXME: check with configure
 */
-#if !defined(__MINGW32__) && !defined(RIOT_VERSION)
+#if !defined(__MINGW32__) && !defined(RIOT_VERSION) && !defined(__ZEPHYR__)
 struct in6_pktinfo {
   struct in6_addr ipi6_addr;        /* src/dst IPv6 address */
   unsigned int ipi6_ifindex;        /* send/recv interface index */

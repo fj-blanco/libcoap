@@ -590,6 +590,35 @@ coap_free_type(coap_memory_tag_t type, void *ptr) {
   heapmem_free(ptr);
 }
 
+#else /* WITH_CONTIKI */
+#if defined(__ZEPHYR__)
+
+void coap_memory_init(void) {
+    // No initialization needed for Zephyr's k_malloc/k_free.
+}
+
+void *coap_malloc_type(coap_memory_tag_t type, size_t size) {
+    (void)type;
+    return k_malloc(size);
+}
+
+void *coap_realloc_type(coap_memory_tag_t type, void *p, size_t size) {
+    (void)type;
+    void *new_ptr = k_malloc(size);
+    if (new_ptr && p) {
+        memcpy(new_ptr, p, size);
+        k_free(p);
+    }
+    return new_ptr;
+}
+
+void coap_free_type(coap_memory_tag_t type, void *p) {
+    (void)type;
+    k_free(p);
+}
+
+#endif /* __ZEPHYR__ */
+
 #endif /* WITH_CONTIKI */
 
 #endif /* ! HAVE_MALLOC */

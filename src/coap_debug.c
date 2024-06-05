@@ -162,7 +162,7 @@ print_timestamp(char *s, size_t len, coap_tick_t t) {
 
 #endif /* HAVE_TIME_H */
 
-#if !defined(HAVE_STRNLEN) && !defined(__MINGW32__)
+#if !defined(HAVE_STRNLEN) && !defined(__MINGW32__) && !defined(__ZEPHYR__)
 /**
  * A length-safe strlen() fake.
  *

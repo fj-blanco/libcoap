@@ -20,6 +20,8 @@
 #include <sys/random.h>
 #elif defined(WITH_CONTIKI)
 #include "lib/csprng.h"
+#elif defined(__ZEPHYR__)
+#include <zephyr/random/rand32.h>
 #else /* !WITH_CONTIKI */
 #include <stdlib.h>
 #endif /* !WITH_CONTIKI */
@@ -97,6 +99,21 @@ coap_prng_default(void *buf, size_t len) {
 
 #elif defined(WITH_CONTIKI)
   return csprng_rand(buf, len);
+
+#elif defined(__ZEPHYR__)
+  uint32_t rand_val;
+  uint8_t *ptr = buf;
+  size_t offset = 0;
+
+  while (len > 0) {
+    rand_val = sys_rand32_get();
+    size_t copy_len = len > sizeof(rand_val) ? sizeof(rand_val) : len;
+    memcpy(ptr + offset, &rand_val, copy_len);
+    len -= copy_len;
+    offset += copy_len;
+  }
+
+  return 1;
 
 #elif defined(_WIN32)
   return coap_prng_impl(buf,len);
