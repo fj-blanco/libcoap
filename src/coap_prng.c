@@ -21,7 +21,7 @@
 #elif defined(WITH_CONTIKI)
 #include "lib/csprng.h"
 #elif defined(__ZEPHYR__)
-#include <zephyr/random/rand32.h>
+#include <zephyr/random/random.h>
 #else /* !WITH_CONTIKI */
 #include <stdlib.h>
 #endif /* !WITH_CONTIKI */
