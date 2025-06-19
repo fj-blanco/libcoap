@@ -57,6 +57,12 @@
 #endif
 #endif /* COAP_EPOLL_SUPPORT */
 
+#ifdef __ZEPHYR__
+#include <zephyr/posix/sys/ioctl.h>
+#define OPTVAL_T(t)         (const void*)(t)
+#define OPTVAL_GT(t)        (void*)(t)
+#endif /* __ZEPHYR__ */
+
 #if !defined(WITH_CONTIKI) && !defined(RIOT_VERSION) && !defined(WITH_LWIP)
 /* define generic PKTINFO for IPv4 */
 #if defined(IP_PKTINFO)
@@ -731,7 +737,7 @@ coap_socket_read(coap_socket_t *sock, uint8_t *data, size_t data_len) {
 
 #endif /* ! WITH_CONTIKI && ! WITH_LWIP && ! RIOT_VERSION */
 
-#if !defined(WITH_LWIP)
+#if !defined(WITH_LWIP) && !defined(__ZEPHYR__)
 #if (!defined(WITH_CONTIKI)) != ( defined(HAVE_NETINET_IN_H) || defined(HAVE_WS2TCPIP_H) )
 /* define struct in6_pktinfo and struct in_pktinfo if not available
    FIXME: check with configure
@@ -749,7 +755,7 @@ struct in_pktinfo {
 };
 #endif /* ! __MINGW32__ */
 #endif
-#endif /* ! WITH_LWIP */
+#endif /* ! WITH_LWIP && ! __ZEPHYR__ */
 
 #if !defined(WITH_CONTIKI) && !defined(SOL_IP)
 /* Solaris expects level IPPROTO_IP for ancillary data. */
