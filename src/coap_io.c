@@ -58,9 +58,27 @@
 #endif /* COAP_EPOLL_SUPPORT */
 
 #ifdef __ZEPHYR__
-#include <zephyr/posix/sys/ioctl.h>
+#include <zephyr/kernel.h>
+#include <zephyr/net/net_ip.h>
+#include <zephyr/net/socket.h>
+#include <zephyr/posix/sys/ioctl.h> // This is for FIONBIO
+#include <zephyr/net/socket_select.h>
+#include <zephyr/net/socket_types.h>
 #define OPTVAL_T(t)         (const void*)(t)
 #define OPTVAL_GT(t)        (void*)(t)
+
+int ioctl(int fd, unsigned long request, ...)
+{
+    // For FIONBIO (set non-blocking), we can ignore it
+    // since Zephyr sockets can be configured differently
+    if (request == FIONBIO) {
+        return 0; // Success - ignore non-blocking request
+    }
+    
+    // For other ioctl requests, return not supported
+    errno = ENOSYS;
+    return -1;
+}
 #endif /* __ZEPHYR__ */
 
 #if !defined(WITH_CONTIKI) && !defined(RIOT_VERSION) && !defined(WITH_LWIP)
