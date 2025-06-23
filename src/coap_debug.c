@@ -184,7 +184,7 @@ strnlen(const char *s, size_t maxlen) {
     ++n;
   return n;
 }
-#endif /* HAVE_STRNLEN && !__MINGW32__ */
+#endif /* HAVE_STRNLEN && !__MINGW32__ && !__ZEPHYR__*/
 
 static size_t
 print_readable(const uint8_t *data, size_t len,
