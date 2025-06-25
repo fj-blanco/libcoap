@@ -44,8 +44,8 @@
 #endif
 #ifndef IN6_IS_ADDR_V4MAPPED
 #define IN6_IS_ADDR_V4MAPPED(a) \
-    ((((a)->s6_addr32[0]) == 0) && (((a)->s6_addr32[1]) == 0) && \
-     (((a)->s6_addr32[2]) == htonl(0xffff)))
+  ((((a)->s6_addr32[0]) == 0) && (((a)->s6_addr32[1]) == 0) && \
+   (((a)->s6_addr32[2]) == htonl(0xffff)))
 #endif
 #endif /* __ZEPHYR__ */
 

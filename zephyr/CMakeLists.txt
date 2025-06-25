@@ -107,7 +107,7 @@ if(CONFIG_LIBCOAP)
   target_compile_definitions(coap-3 PUBLIC WITH_ZEPHYR)
   target_compile_definitions(coap-3 PUBLIC COAP_MEMORY_TYPE_TRACK=1)
   target_link_libraries(coap-3 PUBLIC zephyr_interface)
-  
+
   if(CONFIG_MBEDTLS AND TARGET mbedTLS)
     target_link_libraries(coap-3 PUBLIC mbedTLS)
   endif()
