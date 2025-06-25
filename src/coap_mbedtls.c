@@ -181,10 +181,6 @@ typedef struct {
   uint32_t fin_time;
 } zephyr_timing_delay_context;
 
-/**
- * Set delay callback for DTLS (Zephyr implementation)
- * Compatible with mbedtls_timing_set_delay signature
- */
 static void
 zephyr_timing_set_delay(void *data, uint32_t int_ms, uint32_t fin_ms) {
   zephyr_timing_delay_context *ctx = (zephyr_timing_delay_context *)data;
@@ -199,23 +195,18 @@ zephyr_timing_set_delay(void *data, uint32_t int_ms, uint32_t fin_ms) {
     ctx->int_time = ctx->start_time + int_ms;
     ctx->fin_time = ctx->start_time + fin_ms;
   } else {
-    /* Cancel delays */
     ctx->int_time = 0;
     ctx->fin_time = 0;
   }
 }
 
-/**
- * Get delay status for DTLS (Zephyr implementation)
- * Compatible with mbedtls_timing_get_delay signature and return values
- */
 static int
 zephyr_timing_get_delay(void *data) {
   zephyr_timing_delay_context *ctx = (zephyr_timing_delay_context *)data;
   uint32_t now;
 
   if (ctx == NULL || ctx->fin_time == 0) {
-    return -1;  /* Cancelled */
+    return -1;
   }
 
   now = k_uptime_get_32();
