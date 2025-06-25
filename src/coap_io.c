@@ -60,7 +60,6 @@
 #else /* __ZEPHYR__ */
 #include <zephyr/posix/sys/ioctl.h>
 #include <zephyr/posix/sys/select.h>
-//#include <zephyr/net/socket.h>
 #define OPTVAL_T(t)         (const void*)(t)
 #define OPTVAL_GT(t)        (void*)(t)
 
@@ -69,6 +68,11 @@
 #define IPV6_PKTINFO IPV6_RECVPKTINFO
 #else
 #define IPV6_PKTINFO IP_PKTINFO
+#endif
+#ifndef IN6_IS_ADDR_V4MAPPED
+#define IN6_IS_ADDR_V4MAPPED(a) \
+    ((((a)->s6_addr32[0]) == 0) && (((a)->s6_addr32[1]) == 0) && \
+     (((a)->s6_addr32[2]) == htonl(0xffff)))
 #endif
 #endif
 #endif /* __ZEPHYR__ */

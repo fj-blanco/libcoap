@@ -39,6 +39,14 @@
 #ifndef IN_MULTICAST
 #define IN_MULTICAST(a) ((((long int) (a)) & 0xf0000000) == 0xe0000000)
 #endif
+#ifndef IN6_IS_ADDR_MULTICAST
+#define IN6_IS_ADDR_MULTICAST(a) ((a)->s6_addr[0] == 0xff)
+#endif
+#ifndef IN6_IS_ADDR_V4MAPPED
+#define IN6_IS_ADDR_V4MAPPED(a) \
+    ((((a)->s6_addr32[0]) == 0) && (((a)->s6_addr32[1]) == 0) && \
+     (((a)->s6_addr32[2]) == htonl(0xffff)))
+#endif
 #endif /* __ZEPHYR__ */
 
 #ifdef RIOT_VERSION
