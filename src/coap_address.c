@@ -16,6 +16,7 @@
 #include "coap3/coap_libcoap_build.h"
 
 #if !defined(WITH_CONTIKI) && !defined(WITH_LWIP) && !defined(RIOT_VERSION)
+#if !defined(__ZEPHYR__)
 #ifdef HAVE_ARPA_INET_H
 #include <arpa/inet.h>
 #endif
@@ -34,17 +35,17 @@
 #ifdef HAVE_WS2TCPIP_H
 #include <ws2tcpip.h>
 #endif
+#else /* __ZEPHYR__ */
+#ifndef IN_MULTICAST
+#define IN_MULTICAST(a) ((((long int) (a)) & 0xf0000000) == 0xe0000000)
+#endif
+#endif /* __ZEPHYR__ */
 
 #ifdef RIOT_VERSION
 /* FIXME */
 #define IN_MULTICAST(Address) (0)
 #endif /* RIOT_VERSION */
 
-#ifdef __ZEPHYR__
-#ifndef IN_MULTICAST
-#define IN_MULTICAST(a) ((((long int) (a)) & 0xf0000000) == 0xe0000000)
-#endif
-#endif /* __ZEPHYR__ */
 
 uint16_t
 coap_address_get_port(const coap_address_t *addr) {
