@@ -262,7 +262,7 @@ coap_is_bcast(const coap_address_t *a) {
     if (ipv4.s_addr == b_ipv4[i].s_addr)
       return 1;
   }
-#endif /* HAVE_IFADDRS_H */
+#endif /* HAVE_IFADDRS_H && !defined(__ZEPHYR__) */
   return 0;
 #endif /* COAP_IPV4_SUPPORT */
 }
