@@ -5425,7 +5425,7 @@ coap_mcast_set_hops(coap_session_t *session, size_t hops) {
 }
 #endif /* COAP_CLIENT_SUPPORT */
 
-#else /* defined WITH_CONTIKI || defined WITH_LWIP */
+#else /* defined WITH_CONTIKI || defined WITH_LWIP || defined RIOT_VERSION || defined(__ZEPHYR__) */
 COAP_API int
 coap_join_mcast_group_intf(coap_context_t *ctx COAP_UNUSED,
                            const char *group_name COAP_UNUSED,
@@ -5442,4 +5442,4 @@ coap_mcast_set_hops(coap_session_t *session COAP_UNUSED,
 void
 coap_mcast_per_resource(coap_context_t *context COAP_UNUSED) {
 }
-#endif /* defined WITH_CONTIKI || defined WITH_LWIP */
+#endif /* defined WITH_CONTIKI || defined WITH_LWIP || defined RIOT_VERSION || defined(__ZEPHYR__) */
