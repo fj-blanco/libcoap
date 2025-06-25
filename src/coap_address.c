@@ -16,7 +16,7 @@
 #include "coap3/coap_libcoap_build.h"
 
 #if !defined(WITH_CONTIKI) && !defined(WITH_LWIP) && !defined(RIOT_VERSION)
-#if !defined(__ZEPHYR__)
+#ifndef __ZEPHYR__
 #ifdef HAVE_ARPA_INET_H
 #include <arpa/inet.h>
 #endif
