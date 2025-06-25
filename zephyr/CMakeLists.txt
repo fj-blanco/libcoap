@@ -95,6 +95,12 @@ if(CONFIG_LIBCOAP)
   set (WARNING_TO_ERROR OFF)
   set (ENABLE_THREAD_RECURSIVE_LOCK_CHECK OFF)
 
+  if(CONFIG_MBEDTLS)
+    if(TARGET mbedTLS)
+    target_include_directories(mbedTLS INTERFACE ${ZEPHYR_LIBCOAP_MODULE_DIR}/include)
+    endif()
+  endif()
+
   add_subdirectory(.. build)
   target_compile_definitions(coap-3 PUBLIC WITH_ZEPHYR)
   target_compile_definitions(coap-3 PUBLIC COAP_MEMORY_TYPE_TRACK=1)
