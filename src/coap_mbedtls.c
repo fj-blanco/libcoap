@@ -174,21 +174,12 @@ typedef enum coap_enc_method_t {
 } coap_enc_method_t;
 
 #ifdef __ZEPHYR__
-#include <zephyr/kernel.h>
 
 typedef struct {
   uint32_t start_time;
   uint32_t int_time;
   uint32_t fin_time;
 } zephyr_timing_delay_context;
-
-/**
- * Get current time in milliseconds (Zephyr equivalent)
- */
-static uint32_t
-zephyr_get_timer_ms(void) {
-  return k_uptime_get_32();
-}
 
 /**
  * Set delay callback for DTLS (Zephyr implementation)
@@ -202,7 +193,7 @@ zephyr_timing_set_delay(void *data, uint32_t int_ms, uint32_t fin_ms) {
     return;
   }
 
-  ctx->start_time = zephyr_get_timer_ms();
+  ctx->start_time = k_uptime_get_32();
 
   if (fin_ms != 0) {
     ctx->int_time = ctx->start_time + int_ms;
@@ -227,7 +218,7 @@ zephyr_timing_get_delay(void *data) {
     return -1;  /* Cancelled */
   }
 
-  now = zephyr_get_timer_ms();
+  now = k_uptime_get_32();
 
   if (now >= ctx->fin_time) {
     return 2;
