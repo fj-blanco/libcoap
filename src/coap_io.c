@@ -19,6 +19,7 @@
 #  include <stdio.h>
 #endif
 
+#ifndef __ZEPHYR__
 #ifdef HAVE_SYS_SELECT_H
 # include <sys/select.h>
 #endif
@@ -56,11 +57,20 @@
 #include <limits.h>
 #endif
 #endif /* COAP_EPOLL_SUPPORT */
-
-#ifdef __ZEPHYR__
+#else /* __ZEPHYR__ */
 #include <zephyr/posix/sys/ioctl.h>
+#include <zephyr/posix/sys/select.h>
+//#include <zephyr/net/socket.h>
 #define OPTVAL_T(t)         (const void*)(t)
 #define OPTVAL_GT(t)        (void*)(t)
+
+#ifndef IPV6_PKTINFO
+#ifdef IPV6_RECVPKTINFO
+#define IPV6_PKTINFO IPV6_RECVPKTINFO
+#else
+#define IPV6_PKTINFO IP_PKTINFO
+#endif
+#endif
 #endif /* __ZEPHYR__ */
 
 #if !defined(WITH_CONTIKI) && !defined(RIOT_VERSION) && !defined(WITH_LWIP)
