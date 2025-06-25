@@ -166,7 +166,7 @@ coap_is_mcast(const coap_address_t *a) {
 #define COAP_BCST_REFRESH_SECS 30
 #endif /* COAP_BCST_REFRESH_SECS */
 
-#if COAP_IPV4_SUPPORT && defined(HAVE_IFADDRS_H)
+#if COAP_IPV4_SUPPORT && defined(HAVE_IFADDRS_H) && !defined(__ZEPHYR__)
 static int bcst_cnt = -1;
 static coap_tick_t last_refresh;
 static struct in_addr b_ipv4[COAP_BCST_CNT];
@@ -176,7 +176,7 @@ int
 coap_is_bcast(const coap_address_t *a) {
 #if COAP_IPV4_SUPPORT
   struct in_addr ipv4;
-#if defined(HAVE_IFADDRS_H)
+#if defined(HAVE_IFADDRS_H) && !defined(__ZEPHYR__)
   int i;
   coap_tick_t now;
 #endif /* HAVE_IFADDRS_H */
@@ -212,7 +212,7 @@ coap_is_bcast(const coap_address_t *a) {
   if (ipv4.s_addr == INADDR_BROADCAST)
     return 1;
 
-#if defined(HAVE_IFADDRS_H)
+#if defined(HAVE_IFADDRS_H) && !defined(__ZEPHYR__)
   coap_ticks(&now);
   if (bcst_cnt == -1 ||
       (now - last_refresh) > (COAP_BCST_REFRESH_SECS * COAP_TICKS_PER_SECOND)) {
