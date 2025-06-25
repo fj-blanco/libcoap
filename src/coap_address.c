@@ -54,7 +54,6 @@
 #define IN_MULTICAST(Address) (0)
 #endif /* RIOT_VERSION */
 
-
 uint16_t
 coap_address_get_port(const coap_address_t *addr) {
   assert(addr != NULL);
