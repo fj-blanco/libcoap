@@ -97,7 +97,9 @@ if(CONFIG_LIBCOAP)
 
   if(CONFIG_MBEDTLS)
     if(TARGET mbedTLS)
-    target_include_directories(mbedTLS INTERFACE ${ZEPHYR_LIBCOAP_MODULE_DIR}/include)
+      target_include_directories(mbedTLS INTERFACE ${ZEPHYR_LIBCOAP_MODULE_DIR}/include)
+    else()
+      message(FATAL_ERROR "mbedTLS target not found. Please ensure mbedTLS is available in your Zephyr environment.")
     endif()
   endif()
 
@@ -105,6 +107,11 @@ if(CONFIG_LIBCOAP)
   target_compile_definitions(coap-3 PUBLIC WITH_ZEPHYR)
   target_compile_definitions(coap-3 PUBLIC COAP_MEMORY_TYPE_TRACK=1)
   target_link_libraries(coap-3 PUBLIC zephyr_interface)
+  
+  if(CONFIG_MBEDTLS AND TARGET mbedTLS)
+    target_link_libraries(coap-3 PUBLIC mbedTLS)
+  endif()
+
   set_property(GLOBAL APPEND PROPERTY ZEPHYR_INTERFACE_LIBS coap-3)
 
   target_link_libraries(app PUBLIC coap-3)
