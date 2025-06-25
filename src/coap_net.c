@@ -21,6 +21,8 @@
 #ifdef HAVE_LIMITS_H
 #include <limits.h>
 #endif
+
+#ifndef __ZEPHYR__
 #ifdef HAVE_UNISTD_H
 #include <unistd.h>
 #else
@@ -57,6 +59,7 @@
 #ifdef HAVE_NETDB_H
 #include <netdb.h>
 #endif
+#endif /* !__ZEPHYR__ */
 
 #ifdef WITH_LWIP
 #include <lwip/pbuf.h>
@@ -5128,7 +5131,7 @@ coap_register_option_lkd(coap_context_t *ctx, uint16_t type) {
   coap_option_filter_set(&ctx->known_options, type);
 }
 
-#if ! defined WITH_CONTIKI && ! defined WITH_LWIP && ! defined RIOT_VERSION
+#if ! defined WITH_CONTIKI && ! defined WITH_LWIP && ! defined RIOT_VERSION && !defined(__ZEPHYR__)
 #if COAP_SERVER_SUPPORT
 COAP_API int
 coap_join_mcast_group_intf(coap_context_t *ctx, const char *group_name,
