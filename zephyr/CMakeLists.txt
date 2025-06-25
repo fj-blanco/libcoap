@@ -99,7 +99,7 @@ if(CONFIG_LIBCOAP)
     if(TARGET mbedTLS)
       target_include_directories(mbedTLS INTERFACE ${ZEPHYR_LIBCOAP_MODULE_DIR}/include)
     else()
-      message(FATAL_ERROR "mbedTLS target not found. Please ensure mbedTLS is available in your Zephyr environment.")
+      message(FATAL_ERROR "mbedTLS target not found.")
     endif()
   endif()
 
