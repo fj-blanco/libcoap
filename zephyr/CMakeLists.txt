@@ -20,6 +20,16 @@ if(CONFIG_LIBCOAP)
       PROPERTY STRINGS
              zephyr)
     set(COAP_WITH_LIBMBEDTLS 1)
+    message(STATUS "libcoap: Using mbedTLS for DTLS")
+  elseif(CONFIG_WOLFSSL)
+    set(ENABLE_DTLS ON)
+    set(DTLS_BACKEND "wolfssl" CACHE STRING "wolfSSL build")
+    set_property(
+      CACHE DTLS_BACKEND
+      PROPERTY STRINGS
+             wolfssl)
+    set(COAP_WITH_LIBWOLFSSL 1)
+    message(STATUS "libcoap: Using wolfSSL for DTLS")
   else()
     set(ENABLE_DTLS OFF)
   endif()
@@ -95,6 +105,7 @@ if(CONFIG_LIBCOAP)
   set (WARNING_TO_ERROR OFF)
   set (ENABLE_THREAD_RECURSIVE_LOCK_CHECK OFF)
 
+  # Setup crypto library targets
   if(CONFIG_MBEDTLS)
     if(TARGET mbedTLS)
       target_include_directories(mbedTLS INTERFACE ${ZEPHYR_LIBCOAP_MODULE_DIR}/include)
@@ -108,8 +119,15 @@ if(CONFIG_LIBCOAP)
   target_compile_definitions(coap-3 PUBLIC COAP_MEMORY_TYPE_TRACK=1)
   target_link_libraries(coap-3 PUBLIC zephyr_interface)
 
+  # Link crypto libraries
   if(CONFIG_MBEDTLS AND TARGET mbedTLS)
     target_link_libraries(coap-3 PUBLIC mbedTLS)
+    message(STATUS "libcoap: Linked with mbedTLS")
+  endif()
+
+  if(CONFIG_WOLFSSL AND TARGET wolfssl)
+    target_link_libraries(coap-3 PUBLIC wolfssl)
+    message(STATUS "libcoap: Linked with wolfSSL")
   endif()
 
   set_property(GLOBAL APPEND PROPERTY ZEPHYR_INTERFACE_LIBS coap-3)
