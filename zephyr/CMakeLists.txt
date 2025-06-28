@@ -7,32 +7,28 @@
 # This file is part of the CoAP library libcoap. Please see README for terms
 # of use.
 #
+# MODIFIED to support wolfSSL
 ###############################################################################
 
 cmake_minimum_required(VERSION 3.20.0)
 
 if(CONFIG_LIBCOAP)
+  # DTLS Support - Support both mbedTLS and wolfSSL
   if(CONFIG_MBEDTLS)
     set(ENABLE_DTLS ON)
-    set(DTLS_BACKEND "zephyr" CACHE STRING "Zephyr build")
-    set_property(
-      CACHE DTLS_BACKEND
-      PROPERTY STRINGS
-             zephyr)
+    set(DTLS_BACKEND "zephyr")
     set(COAP_WITH_LIBMBEDTLS 1)
     message(STATUS "libcoap: Using mbedTLS for DTLS")
   elseif(CONFIG_WOLFSSL)
     set(ENABLE_DTLS ON)
-    set(DTLS_BACKEND "wolfssl" CACHE STRING "wolfSSL build")
-    set_property(
-      CACHE DTLS_BACKEND
-      PROPERTY STRINGS
-             wolfssl)
+    set(DTLS_BACKEND "wolfssl")
     set(COAP_WITH_LIBWOLFSSL 1)
     message(STATUS "libcoap: Using wolfSSL for DTLS")
   else()
     set(ENABLE_DTLS OFF)
+    message(STATUS "libcoap: DTLS disabled (no crypto library)")
   endif()
+
   if (CONFIG_LIBCOAP_CLIENT_SUPPORT)
     set (ENABLE_CLIENT_MODE ON)
   else()
@@ -112,6 +108,15 @@ if(CONFIG_LIBCOAP)
     else()
       message(WARNING "mbedTLS target not found.")
     endif()
+  endif()
+
+  # For Zephyr builds, bypass libcoap's find_package calls for crypto libraries
+  # Set variables to indicate crypto libraries are available
+  if(CONFIG_WOLFSSL)
+    set(wolfSSL_FOUND TRUE CACHE BOOL "wolfSSL found via Zephyr module")
+    set(HAVE_LIBWOLFSSL 1 CACHE STRING "Have wolfSSL library")
+    set(WOLFSSL_INCLUDE_DIR "${ZEPHYR_wolfssl_MODULE_DIR}/wolfssl" CACHE PATH "wolfSSL include dir")
+    set(WOLFSSL_LIBRARIES "wolfssl" CACHE STRING "wolfSSL library")
   endif()
 
   add_subdirectory(.. build)
