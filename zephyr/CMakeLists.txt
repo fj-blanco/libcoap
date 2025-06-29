@@ -7,13 +7,11 @@
 # This file is part of the CoAP library libcoap. Please see README for terms
 # of use.
 #
-# MODIFIED to support wolfSSL
 ###############################################################################
 
 cmake_minimum_required(VERSION 3.20.0)
 
 if(CONFIG_LIBCOAP)
-  # DTLS Support - Support both mbedTLS and wolfSSL
   if(CONFIG_MBEDTLS)
     set(ENABLE_DTLS ON)
     set(DTLS_BACKEND "zephyr")
@@ -23,12 +21,15 @@ if(CONFIG_LIBCOAP)
     set(ENABLE_DTLS ON)
     set(DTLS_BACKEND "wolfssl")
     set(COAP_WITH_LIBWOLFSSL 1)
+    # Set wolfSSL variables to prevent find_package call
+    set(wolfSSL_FOUND TRUE CACHE BOOL "wolfSSL found via Zephyr module")
+    set(WOLFSSL_INCLUDE_DIR "${ZEPHYR_BASE}/../modules/crypto/wolfssl" CACHE PATH "wolfSSL include dir")
+    set(WOLFSSL_LIBRARIES "wolfSSL" CACHE STRING "wolfSSL library")
+    set(HAVE_LIBWOLFSSL 1 CACHE STRING "Have wolfSSL library")
     message(STATUS "libcoap: Using wolfSSL for DTLS")
   else()
     set(ENABLE_DTLS OFF)
-    message(STATUS "libcoap: DTLS disabled (no crypto library)")
   endif()
-
   if (CONFIG_LIBCOAP_CLIENT_SUPPORT)
     set (ENABLE_CLIENT_MODE ON)
   else()
@@ -101,7 +102,6 @@ if(CONFIG_LIBCOAP)
   set (WARNING_TO_ERROR OFF)
   set (ENABLE_THREAD_RECURSIVE_LOCK_CHECK OFF)
 
-  # Setup crypto library targets
   if(CONFIG_MBEDTLS)
     if(TARGET mbedTLS)
       target_include_directories(mbedTLS INTERFACE ${ZEPHYR_LIBCOAP_MODULE_DIR}/include)
@@ -110,29 +110,18 @@ if(CONFIG_LIBCOAP)
     endif()
   endif()
 
-  # For Zephyr builds, bypass libcoap's find_package calls for crypto libraries
-  # Set variables to indicate crypto libraries are available
-  if(CONFIG_WOLFSSL)
-    set(wolfSSL_FOUND TRUE CACHE BOOL "wolfSSL found via Zephyr module")
-    set(HAVE_LIBWOLFSSL 1 CACHE STRING "Have wolfSSL library")
-    set(WOLFSSL_INCLUDE_DIR "${ZEPHYR_wolfssl_MODULE_DIR}/wolfssl" CACHE PATH "wolfSSL include dir")
-    set(WOLFSSL_LIBRARIES "wolfssl" CACHE STRING "wolfSSL library")
-  endif()
-
   add_subdirectory(.. build)
   target_compile_definitions(coap-3 PUBLIC WITH_ZEPHYR)
   target_compile_definitions(coap-3 PUBLIC COAP_MEMORY_TYPE_TRACK=1)
   target_link_libraries(coap-3 PUBLIC zephyr_interface)
 
-  # Link crypto libraries
   if(CONFIG_MBEDTLS AND TARGET mbedTLS)
     target_link_libraries(coap-3 PUBLIC mbedTLS)
-    message(STATUS "libcoap: Linked with mbedTLS")
   endif()
 
-  if(CONFIG_WOLFSSL AND TARGET wolfssl)
-    target_link_libraries(coap-3 PUBLIC wolfssl)
-    message(STATUS "libcoap: Linked with wolfSSL")
+  if(CONFIG_WOLFSSL)
+    target_compile_definitions(coap-3 PRIVATE WOLFSSL_USER_SETTINGS)
+    target_link_libraries(coap-3 PUBLIC wolfSSL)
   endif()
 
   set_property(GLOBAL APPEND PROPERTY ZEPHYR_INTERFACE_LIBS coap-3)
