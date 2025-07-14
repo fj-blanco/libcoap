@@ -12,7 +12,7 @@
 cmake_minimum_required(VERSION 3.20.0)
 
 if(CONFIG_LIBCOAP)
-  if(CONFIG_MBEDTLS)
+  if(CONFIG_MBEDTLS AND NOT CONFIG_WOLFSSL)
     set(ENABLE_DTLS ON)
     set(DTLS_BACKEND "zephyr")
     set(COAP_WITH_LIBMBEDTLS 1)
