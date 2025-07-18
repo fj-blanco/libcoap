@@ -1881,6 +1881,7 @@ coap_dtls_context_load_pki_trust_store(coap_context_t *ctx) {
 #else /* LIBWOLFSSL_VERSION_HEX < 0x05005002 */
   coap_log_warn("coap_context_set_pki_trust_store: (D)TLS environment "
                 "not supported for wolfSSL < v5.5.2 or –enable-sys-ca-certs not defined\n");
+  return 0;
 #endif /* WOLFSSL_SYS_CA_CERTS */
 }
 
