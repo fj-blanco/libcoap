@@ -116,6 +116,8 @@ if(CONFIG_LIBCOAP)
   if(CONFIG_MBEDTLS)
     if(TARGET mbedTLS)
       target_include_directories(mbedTLS INTERFACE ${ZEPHYR_LIBCOAP_MODULE_DIR}/include)
+      # Create alias for CMake compatibility - ALIAS targets from add_subdirectory() are not
+      # visible in parent scope, so we must create it here where mbedTLS target is available
       add_library(MbedTLS::mbedtls ALIAS mbedTLS)
     else()
       message(WARNING "mbedTLS target not found.")
@@ -123,14 +125,32 @@ if(CONFIG_LIBCOAP)
   endif()
 
   if(CONFIG_WOLFSSL)
-    target_compile_definitions(wolfSSL INTERFACE WOLFSSL_USER_SETTINGS)
-    add_library(wolfssl::wolfssl ALIAS wolfSSL)
+    # wolfSSL target may not exist yet due to Zephyr module processing order
+    # (libcoap is processed before wolfssl module alphabetically).
+    # Create an INTERFACE library that will be resolved after all modules are processed.
+    if(NOT TARGET wolfssl::wolfssl)
+      add_library(wolfssl::wolfssl INTERFACE IMPORTED GLOBAL)
+      set_target_properties(wolfssl::wolfssl PROPERTIES
+        INTERFACE_INCLUDE_DIRECTORIES "${ZEPHYR_BASE}/../modules/crypto/wolfssl;${ZEPHYR_BASE}/../modules/crypto/wolfssl/wolfssl"
+        INTERFACE_COMPILE_DEFINITIONS "WOLFSSL_USER_SETTINGS"
+      )
+    endif()
   endif()
 
   add_subdirectory(.. build)
   target_compile_definitions(coap-3 PUBLIC WITH_ZEPHYR)
   target_compile_definitions(coap-3 PUBLIC COAP_MEMORY_TYPE_TRACK=1)
   target_link_libraries(coap-3 PUBLIC zephyr_interface)
+
+  if(CONFIG_MBEDTLS AND TARGET mbedTLS)
+    target_link_libraries(coap-3 PUBLIC mbedTLS)
+  endif()
+
+  if(CONFIG_WOLFSSL)
+    # Link to the actual Zephyr wolfSSL library (created by wolfssl module)
+    target_compile_definitions(coap-3 PRIVATE WOLFSSL_USER_SETTINGS)
+    target_link_libraries(coap-3 PUBLIC wolfSSL)
+  endif()
 
   set_property(GLOBAL APPEND PROPERTY ZEPHYR_INTERFACE_LIBS coap-3)
 
