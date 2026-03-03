@@ -2465,6 +2465,7 @@ finished:
 unsigned int
 coap_dtls_get_overhead(coap_session_t *session) {
   unsigned int overhead = 37;
+#ifdef OPENSSL_ALL
   const WOLFSSL_CIPHER *s_ciph = NULL;
   coap_wolfssl_env_t *w_env = (coap_wolfssl_env_t *)session->tls;
   WOLFSSL *ssl = w_env ? w_env->ssl : NULL;
@@ -2533,6 +2534,13 @@ coap_dtls_get_overhead(coap_session_t *session) {
     overhead = WOLFSSL_DTLS13_RT_HEADER_LENGTH + ivlen + maclen + blocksize - 1 +
                pad;
   }
+#else
+  /* Without OPENSSL_ALL, wolfSSL_CIPHER_get_cipher_nid() and
+   * wolfSSL_CIPHER_get_digest_nid() are unavailable.  Return the
+   * default 37 which is correct for DTLS 1.3 AES-128-GCM-SHA256:
+   *   13 (record header) + 8 (explicit IV) + 16 (GCM tag) = 37 */
+  (void)session;
+#endif /* OPENSSL_ALL */
   return overhead;
 }
 
